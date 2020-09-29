@@ -1,2 +1,2 @@
-# Kargot
+# Kargo
 OpenShift KubeVirt Undercloud
