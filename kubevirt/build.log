@@ -1,0 +1,31 @@
+https://opensource.com/article/20/9/vms-kubernetes-kubevirt
+https://kubevirt.io/2019/KubeVirt_storage_rook_ceph.html
+https://github.com/rook/rook/tree/master/Documentation
+https://ceph.io/community/deploying-a-cephnfs-server-cluster-with-rook/
+https://www.digitalocean.com/community/tutorials/how-to-set-up-a-ceph-cluster-within-kubernetes-using-rook
+https://kubesail.com/blog/rook-ceph-advanced/
+https://github.com/rook/rook/blob/master/Documentation/ceph-pool-crd.md
+
+```sh
+# How to uninstall
+kubectl delete -n rook-ceph cephblockpool replicapool
+kubectl delete storageclass rook-ceph-block
+
+# cleanup.sh
+rm -rf /var/lib/rook
+for i in $(fdisk -l | awk '/ceph/{print $2}' | sed 's/://g'); do
+  echo "processing $i"
+  echo
+  dmsetup remove $i
+  wipefs -af $i
+  echo
+done
+```
+```
+kubectl get service aio-n01 --output='jsonpath="{.spec.ports[0].nodePort}"' -n aio
+ssh root@10.0.0.3 -p 30928
+```
+```
+# for software emulation (hvm == software emulated vm hardware
+kubectl create configmap kubevirt-config -n kubevirt --from-literal debug-useEmulation=true
+```
