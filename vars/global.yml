@@ -1,0 +1,62 @@
+---
+# Custom Variables
+domain_base: codectl.io
+name_cluster: 'kargo'
+domain_cluster: '{{ name_cluster }}.{{ domain_base }}'
+
+# Core variables
+name_vendor: ' CCIO'
+ansible_name: " {{ name_vendor }} | CloudCtl | {{ ansible_distribution }}"
+
+# Ansible Playbook Run Variables
+ssh_enabled: true
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+ansible_python_interpreter: auto_silent
+
+# CloudCtl Variables
+image_tag_konductor: docker.io/cloudctl/konductor
+sshkeys_pub: "{{ lookup('file', '{{ ansible_env.HOME }}/.ssh/id_rsa.pub') }}"
+
+# Local Environment 
+dir_platform_name: "platform"
+local_user: "{{ ansible_env.USER }}"
+dir_local_home: "{{ lookup('env','HOME') }}"
+dir_local_path: "{{ lookup('env','PWD') }}"
+dir_platform: "{{ dir_local_home }}/{{ dir_platform_name }}"
+
+# Remote Environment 
+dir_secrets: "{{ dir_platform }}/secrets"
+dir_iac: "{{ dir_platform }}/iac"
+
+# Dir Structure
+ctltree:
+  - path: "{{ dir_tmp }}"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_iac }}"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_platform }}"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_platform }}/bin"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_platform }}/pod"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_platform }}/secrets"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_platform }}/profile.d"
+    state: directory
+    mode: '0744'
+  - path: "{{ dir_secrets }}/registry/auth"
+    state: directory
+    mode: '0744'
+
+# SSH Keys
+sshkeys_pub_file: "{{ lookup('env', 'HOME') }}/platform/{{ cluster_domain }}/.ssh/id_rsa_{{ cluster_domain }}.pub"
+sshkeys_priv_file: "{{{ lookup('env', 'HOME') }}/platform/{{ cluster_domain }}/.ssh/id_rsa_{{ cluster_domain }}"
+sshkeys_pub_string: "{{ lookup('file', '{{ sshkeys_pub_file }}') }}"
+sshkeys_priv_string: "{{ lookup('file', '{{ sshkeys_priv_file }}') }}"

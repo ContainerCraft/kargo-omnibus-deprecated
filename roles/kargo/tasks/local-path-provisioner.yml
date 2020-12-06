@@ -1,0 +1,9 @@
+- name: create /opt/local-path-provisioner
+  file: path=/opt/local-path-provisioner state=directory
+
+- name: apply K8s definitions
+  command: kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+
+- name: set local-path storage class to be the default
+  command: "kubectl patch storageclass local-path -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"
+# when: k8s_set_local_path_class_default

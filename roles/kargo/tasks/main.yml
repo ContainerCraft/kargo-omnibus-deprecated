@@ -1,0 +1,3 @@
+---
+- name: '{{ ansible_name_module }} | include_tasks | local-path-provisioner.yml'
+  include_tasks: local-path-provisioner.yml
