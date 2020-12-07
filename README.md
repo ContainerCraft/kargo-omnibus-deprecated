@@ -1,4 +1,4 @@
-# Kargo | ContainerCraft KubeVirt Hypervisor
+# Kargo | CCIO KubeVirt Hypervisor
 The Kargo toolkit builds a Kubernetes KubeVirt based hypervisor on linux.
 
 ### Purpose:
@@ -10,8 +10,9 @@ of gitops and declarative infrastructure as code with an emphasis on budget como
 high performance scalable production like infrastructure modeling orchestration.
 
 This currently novel approach brings many advantages including:
-  - Minimal build skill and effort
-  - Consistent outcomes
+  - Know Results
+  - Minimal build skill and effort requirements
+  - Declarative Virtual Machine & Virtual Network Overlay Orchestration
   - Agnostic consistency across kubernetes and OS distributions
 
 ### Usage:
