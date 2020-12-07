@@ -1,9 +1,9 @@
 #!/usr/local/bin/ansible-playbook --inventory=inventory.yaml
-- name: 'Konductor | CCIO | VPC'
+- name: 'CCIO | Kargo'
   hosts: kargo
   vars:
-    module: "k3s"
-    ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
+    module: "kargo"
+    ansible_name_module: "CCIO | Kargo | {{ ansible_os_family }} | {{ module }}"
   vars_files:
     - vars/global.yml
 

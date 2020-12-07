@@ -1,0 +1,25 @@
+#!/usr/local/bin/ansible-playbook --inventory=inventory
+# Purpose:
+# - build k3s on target host
+############################################################################
+# Localhost Prep Tasks
+- name: 'CCIO | Kargo | Prep | prepare host for Kargo'
+  hosts: kargo
+  vars:
+    module: "prep"
+    ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
+  vars_files:
+    - 'vars/global.yml'
+    - 'vars/{{ ansible_os_family }}.yml'
+  tasks:
+
+    - name: '{{ ansible_name_module }} | selinux | configure permissive'
+      selinux:
+        policy: targeted
+        state: permissive
+
+    - name: '{{ ansible_name_module }} | command | disable selinux'
+      command:
+        cmd: 'setenforce 0'
+      ignore_errors: true
+      changed_when: false
