@@ -98,19 +98,36 @@
           --kubeconfig /root/.kube/config
       changed_when: true
 
-    ####### Copy k3s .kube/config to localhost .kube/config
+    ####### Fetch k3s .kube/config
     - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
       fetch:
         src: "/etc/rancher/k3s/k3s.yaml"
         dest: "{{ ansible_env.HOME }}/.kube/config"
         flat: yes
 
-    ####### Purge SSH known_hosts entries if previous entries found
-    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/ensign'
-      delegate_to: localhost
+    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ ansible_default_ipv4.address }}'
+      delegate_to: konductor
       lineinfile:
         dest: "{{ ansible_env.HOME }}/.kube/config"
         regexp: "{{ item.match }}"
         line: "{{ item.new }}"
       with_items:
         - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ ansible_default_ipv4.address }}:6443' }
+
+    ####### Copy k3s .kube/config to localhost .kube/config
+    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+      delegate_to: host
+      file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        owner: "root"
+        mode: "u=rwx,g=rx,o="
+
+
+    ####### Copy k3s .kube/config to localhost .kube/config
+    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+      delegate_to: host
+      copy:
+        src: "/root/.kube/config"
+        dest: "{{ ansible_env.HOME }}/.kube/config.kargo"
+        mode: 0755
