@@ -1,4 +1,4 @@
-#!/usr/local/bin/ansible-playbook --inventory=inventory
+#!/usr/local/bin/ansible-playbook
 # Purpose:
 # - build k3s on target host
 ############################################################################
@@ -14,12 +14,55 @@
   tasks:
 
     - name: '{{ ansible_name_module }} | selinux | configure permissive'
-      selinux:
-        policy: targeted
-        state: permissive
+      command:
+        cmd: 'grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory intel_iommu=on iommu=pt rd.driver.pre=vfio-pci"'
 
     - name: '{{ ansible_name_module }} | command | disable selinux'
       command:
         cmd: 'setenforce 0'
       ignore_errors: true
       changed_when: false
+
+    - name: Enable IPv4 forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        reload: yes
+    
+    - name: Enable IPv6 forwarding
+      sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: "1"
+        state: present
+        reload: yes
+    
+    - name: Add br_netfilter to /etc/modules-load.d/
+      copy:
+        content: "br_netfilter"
+        dest: /etc/modules-load.d/br_netfilter.conf
+        mode: "u=rw,g=,o="
+    
+    - name: Load br_netfilter
+      modprobe:
+        name: br_netfilter
+        state: present
+    
+    - name: Set bridge-nf-call-iptables (just to be sure)
+      sysctl:
+        name: "{{ item }}"
+        value: "1"
+        state: present
+        reload: yes
+      loop:
+        - net.bridge.bridge-nf-call-iptables
+        - net.bridge.bridge-nf-call-ip6tables
+    
+    - name: Add /usr/local/bin to sudo secure_path
+      lineinfile:
+        line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
+        regexp: "Defaults(\\s)*secure_path(\\s)*="
+        state: present
+        insertafter: EOF
+        path: /etc/sudoers
+        validate: 'visudo -cf %s'
