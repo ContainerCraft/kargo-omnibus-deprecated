@@ -5,7 +5,7 @@ all:
     kargo:
       hosts:
         kargo:
-          ansible_host: 192.168.1.105
+          ansible_host: '{{ kargo_host }}'
       vars:
         ansible_port: 22
         ansible_user: root

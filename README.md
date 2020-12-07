@@ -26,3 +26,7 @@ mkdir -p /root/kargo && \
 podman run -it --rm -v /root/kargo:/clone:z \
   quay.io/cloudctl/git https://github.com/ContainerCraft/Kargo.git && cd /root/kargo
 ```
+Run Konductor Kargo Playbook
+```
+./kargo.sh -e kargo_host='192.168.1.105'
+```
