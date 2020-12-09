@@ -12,4 +12,4 @@ sudo podman run -it --rm \
     --volume /tmp/.ssh:/root/.ssh:z                 \
     --workdir /root/platform/iac/${project}         \
     --volume $(pwd):/root/platform/iac/${project}:z \
-  docker.io/cloudctl/konductor $@
+  docker.io/cloudctl/konductor -e local_user="$(whoami)" $@
