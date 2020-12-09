@@ -1,6 +1,6 @@
 ---
 ####### Update All Packages
-# name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Update Packages | dnf | "*":latest'
+# name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Update Packages | dnf | "*":latest'
 # dnf:
 #   name: "*"
 #   state: latest
@@ -17,20 +17,20 @@
     state: present
  
 ####### Enable epel release 
-# name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Copr Repo | command | Enable WireGuard Repo'
+# name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Copr Repo | command | Enable WireGuard Repo'
 # command:
 #   cmd: dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 #   creates: /etc/yum.repos.d/epel.repo
 #   warn: false
 
 ####### Add Docker Repo
-- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Install Packages | get_url | Download Docker CE repo'
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | get_url | Download Docker CE repo'
   get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
+    url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/docker-ce.repo
     dest: /etc/yum.repos.d/docer-ce.repo
  
 ####### Install packages from URL sources
-- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Install Packages | dnf | Install Packages from URL'
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | dnf | Install Packages from URL'
   dnf:
     state: present
     name:
@@ -39,7 +39,7 @@
     disable_gpg_check: yes
  
 ####### Enable Docker CE Test Repo
-- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Install Packages | ini_file | Enable Docker Test repo'
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | ini_file | Enable Docker Test repo'
   ini_file:
     value: "0"
     section: 'docker-ce-test'
@@ -47,7 +47,7 @@
     option: enabled
  
 ####### Enable Docker CE Test Repo
-- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Install Packages | package | Install Packages'
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | package | Install Packages'
   package:
     name: 
       - containerd.io
@@ -56,13 +56,13 @@
       - selinux-policy-base
     state: present
  
-- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Install Packages | modprobe | load wireguard kernel module'
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | modprobe | load wireguard kernel module'
   modprobe:
     name: wireguard
     state: present
 
 ####### Download K3s Install Script
-- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_os_family }} | Install Packages | get_url | Download k3s Script'
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | get_url | Download k3s Script'
   get_url:
     url: 'https://get.k3s.io'
     dest: /usr/local/bin/get-k3s-io
