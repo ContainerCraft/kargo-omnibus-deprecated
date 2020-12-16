@@ -1,3 +1,4 @@
+---
 - name: create /opt/local-path-provisioner
   file: path=/opt/local-path-provisioner state=directory
 
@@ -6,4 +7,3 @@
 
 - name: set local-path storage class to be the default
   command: "kubectl patch storageclass local-path -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"
-# when: k8s_set_local_path_class_default

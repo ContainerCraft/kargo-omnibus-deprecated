@@ -1,0 +1,15 @@
+---
+apiVersion: networkaddonsoperator.network.kubevirt.io/v1
+kind: NetworkAddonsConfig
+metadata:
+  name: cluster
+spec:
+  imagePullPolicy: IfNotPresent
+  linuxBridge: {}
+  macvtap: {}
+  multus: {}
+  ovs: {}
+
+### Node Selector Troubleshooting Required
+# kubeMacPool: {}
+# nmstate: {}

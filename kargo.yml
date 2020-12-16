@@ -12,4 +12,5 @@
     - 'vars/global.yml'
     - 'vars/{{ ansible_os_family }}.yml'
   roles:
-    - kargo
+    - storage-localpath
+    - cluster-network-addons-operator

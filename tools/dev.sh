@@ -1,5 +1,5 @@
 #!/bin/bash
-project="kargo-dev"
+project="kargo"
 
 sudo rm -rf /tmp/.ssh
 sudo cp -rf ~/.ssh /tmp/

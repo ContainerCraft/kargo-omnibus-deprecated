@@ -1,0 +1,137 @@
+#!/usr/local/bin/ansible-playbook
+# Purpose:
+# - build k3s on target host
+############################################################################
+# Localhost Prep Tasks
+- name: MSIO | Kargo | K3s Deploy | ansible/run-k3s
+  hosts: kargo
+  vars:
+    module: "kubectl"
+    ansible_name_module: "Konductor | CCIO | {{ ansible_distribution }} | {{ module }}"
+  vars_files:
+    - 'vars/global.yml'
+    - 'vars/{{ ansible_os_family }}.yml'
+  tasks:
+
+############################################################################
+# Kargo Tasks
+
+    ####### Install packages
+    - name: '{{ ansible_name_module }} | get_url | {{ ansible_distribution }} | Download kubectl'
+      delegate_to: konductor
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0775'
+
+    - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Start ContainerD service'
+      systemd:
+        name: containerd
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Disable Firewalld service'
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: no
+      become: yes
+
+    - name: Download k3s binary x64
+      get_url:
+#       url: https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/k3s
+#       checksum: sha256:https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/sha256sum-amd64.txt
+        url: https://github.com/k3s-io/k3s/releases/download/v1.19.4%2Bk3s1/k3s
+        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v1.19.4%2Bk3s1/sha256sum-amd64.txt
+        dest: /usr/local/bin/k3s
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Create kubectl symlink
+      file:
+        src: /usr/local/bin/k3s
+        dest: /usr/local/bin/kubectl
+        state: link
+
+    - name: Create crictl symlink
+      file:
+        src: /usr/local/bin/k3s
+        dest: /usr/local/bin/crictl
+        state: link
+
+    ####### Place k3s .kube/config
+    - name: Copy K3s service file
+      template:
+        src: "systemd/k3s.service.j2"
+        dest: "/etc/systemd/system/k3s.service"
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Enable and check K3s service
+      systemd:
+        name: k3s
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
+    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Create .kube directory'
+      file:
+        path: /root/.kube
+        state: directory
+        owner: "root"
+        mode: "u=rwx,g=rx,o="
+
+    - wait_for:
+        path: "/etc/rancher/k3s/k3s.yaml"
+
+    - name: Copy config file to .kube/config
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /root/.kube/config
+        remote_src: yes
+        owner: "root"
+        mode: "u=rw,g=,o="
+
+    - name: 'Replace https://localhost:6443 by https://{{ ansible_default_ipv4.address }}:6443'
+      command: >-
+        k3s kubectl config set-cluster default
+          --server=https://{{ ansible_default_ipv4.address }}:6443
+          --kubeconfig /root/.kube/config
+      changed_when: true
+
+    ####### Fetch k3s .kube/config
+    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+      fetch:
+        src: "/etc/rancher/k3s/k3s.yaml"
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        flat: yes
+
+    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ ansible_default_ipv4.address }}'
+      delegate_to: konductor
+      lineinfile:
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        regexp: "{{ item.match }}"
+        line: "{{ item.new }}"
+      with_items:
+        - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ ansible_default_ipv4.address }}:6443' }
+
+    ####### Copy k3s .kube/config to localhost .kube/config
+    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+      delegate_to: host
+      file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        owner: "root"
+        mode: "u=rwx,g=rx,o="
+
+
+    ####### Copy k3s .kube/config to localhost .kube/config
+    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+      delegate_to: host
+      copy:
+        src: "/root/.kube/config"
+        dest: "{{ ansible_env.HOME }}/.kube/config.kargo"
+        mode: 0755

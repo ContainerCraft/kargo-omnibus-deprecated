@@ -11,7 +11,7 @@ ansible_name: " {{ name_vendor }} | CloudCtl | {{ ansible_distribution }}"
 # Ansible Playbook Run Variables
 ssh_enabled: true
 ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
-ansible_python_interpreter: auto_silent
+ansible_python_interpreter: /usr/bin/python3
 
 # CloudCtl Variables
 image_tag_konductor: docker.io/cloudctl/konductor

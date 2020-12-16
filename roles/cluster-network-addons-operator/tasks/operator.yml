@@ -1,0 +1,15 @@
+---
+- name: Apply network addons operator namespace
+  command: kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.43.0/namespace.yaml
+
+- name: Apply network addons operator crd
+  command: kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.43.0/network-addons-config.crd.yaml
+
+- name: Apply network addons operator operator
+  command: kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.43.0/operator.yaml
+
+- name: Apply CNAO config
+  delegate_to: konductor
+  k8s:
+    state: present
+    src: /root/platform/iac/kargo/templates/cluster-network-addons-operator/network-addons-config-cr.yaml
