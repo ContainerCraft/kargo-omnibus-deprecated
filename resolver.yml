@@ -6,20 +6,19 @@
     ansible_name_module: "Konductor | CCIO | {{ ansible_distribution }} | {{ module }}"
   vars_files:
     - 'vars/global.yml'
-    - 'vars/{{ ansible_os_family }}.yml'
   tasks:
 
-    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Create .kube directory'
+    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Backup resolved.conf'
       copy:
         src: /etc/systemd/resolved.conf
         dest: /etc/systemd/resolved.conf.bak
 
-    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Create .kube directory'
+    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Remove resolved.conf'
       file:
         path: /etc/systemd/resolved.conf
         state: absent
 
-    - name: '{{ ansible_name_module }} | template | Create resolved.conf'
+    - name: '{{ ansible_name_module }} | template | {{ ansible_distribution }} | Create resolved.conf'
       template:
         src: "systemd/resolved.conf.j2"
         dest: "/etc/systemd/resolved.conf"
@@ -27,7 +26,7 @@
         group: root
         mode: 0755
 
-    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Create .kube directory'
+    - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Create resolved config directory'
       file:
         path: /run/systemd/resolve
         state: directory
@@ -35,24 +34,24 @@
         group: "systemd-resolve"
         mode: "u=rwx,g=rx,o="
 
-    - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Stop & Disable Systemd'
-      systemd:
-        name: dnsmasq
-        state: stopped
-        enabled: no
-      become: yes
+#   - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Stop & Disable dnsmasq'
+#     systemd:
+#       name: dnsmasq
+#       state: stopped
+#       enabled: no
+#     become: yes
 
-    - name: '{{ ansible_name_module }} | command | pkill -KILL dnsmasq'
-      command:
-        cmd: 'pkill -KILL dnsmasq'
-        warn: no
-      ignore_errors: true
+#   - name: '{{ ansible_name_module }} | command | pkill -KILL dnsmasq'
+#     command:
+#       cmd: 'pkill -KILL dnsmasq'
+#       warn: no
+#     ignore_errors: true
 
-    - name: '{{ ansible_name_module }} | command | pkill -KILL dnsmasq'
-      command:
-        cmd: 'pkill -KILL dnsmasq'
-        warn: no
-      ignore_errors: true
+#   - name: '{{ ansible_name_module }} | command | pkill -KILL dnsmasq'
+#     command:
+#       cmd: 'pkill -KILL dnsmasq'
+#       warn: no
+#     ignore_errors: true
 
     - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Enable & Restart Systemd Resolved'
       systemd:

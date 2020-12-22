@@ -5,6 +5,7 @@
 # Localhost Prep Tasks
 - name: 'CCIO | Kargo | Prep | prepare host for Kargo'
   hosts: kargo
+  become: true
   vars:
     module: "prep"
     ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
@@ -13,24 +14,11 @@
     - 'vars/{{ ansible_os_family }}.yml'
   tasks:
 
-    - name: '{{ ansible_name_module }} | selinux | configure permissive'
-      command:
-        cmd: 'grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory intel_iommu=on iommu=pt rd.driver.pre=vfio-pci pci=realloc"'
-
-    - name: Reboot host and wait for it to restart
-      reboot:
-        msg: "Reboot initiated by Ansible"
-        connect_timeout: 5
-        reboot_timeout: 600
-        pre_reboot_delay: 0
-        post_reboot_delay: 30
-        test_command: whoami
-
-    - name: '{{ ansible_name_module }} | command | disable selinux'
-      command:
-        cmd: 'setenforce 0'
-      ignore_errors: true
-      changed_when: false
+#   - name: '{{ ansible_name_module }} | command | disable selinux'
+#     command:
+#       cmd: 'setenforce 0'
+#     ignore_errors: true
+#     changed_when: false
 
     - name: Enable IPv4 forwarding
       sysctl:

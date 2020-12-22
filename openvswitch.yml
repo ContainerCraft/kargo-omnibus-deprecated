@@ -1,0 +1,15 @@
+#!/usr/local/bin/ansible-playbook
+- name: 'Konductor | CCIO | Kargo | Prepare OpenVSwitch'
+  hosts: kargo
+  become: true
+  gather_facts: yes
+  vars:
+    module: "ovs"
+    ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
+    
+  vars_files:
+    - 'vars/global.yml'
+
+  roles:
+    - role: openvswitch 
+      tags: ovs

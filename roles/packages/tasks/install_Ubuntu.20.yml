@@ -1,0 +1,21 @@
+---
+- name: '{{ ansible_name_module_cloud }} | {{ ansible_distribution }} | Install Packages'
+  become: yes
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - '{{ packages_Ubuntu }}'
+
+- name: '{{ ansible_name_module_cloud }} | {{ ansible_distribution }} | Enable & Start OpenVSwitch Service'
+  become: yes
+  service:
+    name: openvswitch-switch
+    state: started
+    enabled: yes
+
+- name: '{{ ansible_name_module_cloud }} | {{ ansible_distribution }} | modprobe | load wireguard kernel module'
+  modprobe:
+    name: wireguard
+    state: present
+

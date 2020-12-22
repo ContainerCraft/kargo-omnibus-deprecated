@@ -1,0 +1,53 @@
+---
+configure_ovs_packages: false
+packages_Ubuntu:
+  - qemu-kvm
+  - libvirt0
+  - libvirt-daemon
+  - python3-libvirt
+  - qemu-system-x86
+  - openvswitch-switch
+  - libvirt-daemon-driver-qemu
+  - libvirt-daemon-system-systemd
+
+packages_ovs_fedora:
+  - yum-utils
+  - openvswitch
+  - oci-kvm-hook
+  - qemu-kvm-core
+  - container-selinux
+  - selinux-policy-base
+  - libvirt-daemon
+  - libvirt-daemon-kvm
+  - network-scripts-openvswitch
+
+packages_ova_rhel8:
+  - openvswitch
+
+packages_ova_rhel7:
+  - wget
+  - openssl-devel
+  - python-sphinx
+  - gcc
+  - make
+  - python-devel
+  - openssl-devel
+  - kernel-devel
+  - graphviz
+  - kernel-debug-devel
+  - autoconf
+  - automake
+  - rpm-build
+  - redhat-rpm-config
+  - libtool
+  - python-twisted-core
+  - python-zope-interface
+  - PyQt4
+  - desktop-file-utils
+  - libcap-ng-devel
+  - groff
+  - checkpolicy
+  - selinux-policy-devel
+  - unbound
+  - unbound-devel
+  - gcc-c++

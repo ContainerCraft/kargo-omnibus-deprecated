@@ -9,13 +9,6 @@
 - name: '{{ ansible_name_module_cloud }} | package | Install yum-utils & epel-release'
   package:
     name:
-     - yum-utils
-     - libvirt-daemon
-     - libvirt-daemon-kvm
-     - oci-kvm-hook
-     - qemu-kvm-core
-     - container-selinux
-     - selinux-policy-base
     state: present
  
 ####### Enable epel release 

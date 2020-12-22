@@ -23,7 +23,6 @@
     - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Start ContainerD service'
       systemd:
         name: containerd
-        state: started
         enabled: yes
       become: yes
 
@@ -34,12 +33,16 @@
         enabled: no
       become: yes
 
+    - name: Check for latest release of k3s
+      delegate_to: konductor
+      command: >-
+          curl -s https://api.github.com/repos/k3s-io/k3s/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+      register: k3s_version
+
     - name: Download k3s binary x64
       get_url:
-#       url: https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/k3s
-#       checksum: sha256:https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/sha256sum-amd64.txt
-        url: https://github.com/k3s-io/k3s/releases/download/v1.19.4%2Bk3s1/k3s
-        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v1.19.4%2Bk3s1/sha256sum-amd64.txt
+        url: https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/k3s
+        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/sha256sum-amd64.txt
         dest: /usr/local/bin/k3s
         owner: root
         group: root
@@ -66,11 +69,10 @@
         group: root
         mode: 0755
 
-    - name: Enable and check K3s service
+    - name: Enable K3s service
       systemd:
         name: k3s
         daemon_reload: yes
-        state: restarted
         enabled: yes
 
     - name: '{{ ansible_name_module }} | file | {{ ansible_distribution }} | Create .kube directory'
@@ -91,10 +93,10 @@
         owner: "root"
         mode: "u=rw,g=,o="
 
-    - name: 'Replace https://localhost:6443 by https://{{ ansible_default_ipv4.address }}:6443'
+    - name: 'Replace https://localhost:6443 by https://{{ kargo_addr_n01 }}:6443'
       command: >-
         k3s kubectl config set-cluster default
-          --server=https://{{ ansible_default_ipv4.address }}:6443
+          --server=https://{{ kargo_addr_n01 }}:6443
           --kubeconfig /root/.kube/config
       changed_when: true
 
@@ -105,14 +107,14 @@
         dest: "{{ ansible_env.HOME }}/.kube/config"
         flat: yes
 
-    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ ansible_default_ipv4.address }}'
+    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ kargo_host }}'
       delegate_to: konductor
       lineinfile:
         dest: "{{ ansible_env.HOME }}/.kube/config"
         regexp: "{{ item.match }}"
         line: "{{ item.new }}"
       with_items:
-        - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ ansible_default_ipv4.address }}:6443' }
+        - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ kargo_host }}:6443' }
 
     ####### Copy k3s .kube/config to localhost .kube/config
     - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'

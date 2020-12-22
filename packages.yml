@@ -1,0 +1,16 @@
+#!/usr/local/bin/ansible-playbook
+- name: 'Konductor | CCIO | Kargo | Install Kargo Dependencies'
+  hosts: kargo
+  become: true
+  gather_facts: yes
+  vars:
+    module: "packages"
+    ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
+    
+  vars_files:
+    - 'vars/global.yml'
+    - 'vars/packages.yml'
+
+  roles:
+    - role: packages 
+      tags: pkg

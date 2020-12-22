@@ -1,0 +1,13 @@
+---
+- name: '{{ ansible_name_module }} | template | Create /etc/default/grub'
+  template:
+    src: "grub/grub.j2"
+    dest: "/etc/default/grub"
+    owner: root
+    group: root
+    mode: 0744
+
+- name: '{{ ansible_name_module }} | command:update-grub | Generate config'
+  command: 
+    cmd: |
+      update-grub

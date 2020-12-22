@@ -4,7 +4,7 @@ all:
   children:
     kargo:
       hosts:
-        kargo:
+        n01:
           ansible_host: '{{ kargo_host }}'
       vars:
         ansible_port: 22
@@ -20,6 +20,6 @@ all:
         ansible_connection: ssh
     konductor:
       hosts:
-        konductor:
+        self:
           ansible_user: root
           ansible_connection: local

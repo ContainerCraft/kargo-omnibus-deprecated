@@ -9,22 +9,26 @@ WantedBy=multi-user.target
 
 [Service]
 Type=notify
-#EnvironmentFile=/etc/systemd/system/k3s.service.env
-KillMode=process
 Delegate=yes
-# Having non-zero Limit*s causes performance problems due to accounting overhead
-# in the kernel. We recommend using cgroups to do container-local accounting.
-LimitNOFILE=1048576
-LimitNPROC=infinity
-LimitCORE=infinity
+RestartSec=5s
+Restart=always
+KillMode=process
 TasksMax=infinity
 TimeoutStartSec=0
-Restart=always
-RestartSec=5s
-ExecStartPre=-/sbin/modprobe br_netfilter
+LimitCORE=infinity
+LimitNPROC=infinity
+LimitNOFILE=1048576
 ExecStartPre=-/sbin/modprobe overlay
-ExecStart=/usr/local/bin/k3s \
-    server \
-	'--disable-selinux' \
-	'--no-deploy=traefik' \
-
+ExecStartPre=-/sbin/modprobe br_netfilter
+ExecStart=/usr/local/bin/k3s server \
+                        '--disable-selinux' \
+                        '--no-deploy=traefik' \
+                        '--no-deploy=servicelb' \
+                        '--flannel-backend=none' \
+                        '--disable-network-policy' \
+                        '--https-listen-port=6443' \
+                        '--node-label=kargo-master' \
+                        '--node-name={{ kargo_name_n01 }}' \
+                        '--cluster-cidr={{ cluster_cidr }}' \
+                        '--bind-address={{ kargo_addr_n01 }}' \
+                        '--node-external-ip={{ kargo_addr_n01 }}'

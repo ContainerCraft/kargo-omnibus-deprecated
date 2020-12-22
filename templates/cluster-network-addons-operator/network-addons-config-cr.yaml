@@ -13,3 +13,5 @@ spec:
 ### Node Selector Troubleshooting Required
 # kubeMacPool: {}
 # nmstate: {}
+### Depricated
+# sriov: {}

@@ -1,0 +1,15 @@
+#!/usr/local/bin/ansible-playbook
+- name: 'Konductor | CCIO | Kargo | Prepare KVM Hypervisor'
+  hosts: kargo
+  become: true
+  gather_facts: yes
+  vars:
+    module: "kvm"
+    ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
+    
+  vars_files:
+    - 'vars/global.yml'
+
+  roles:
+    - role: libvirt
+      tags: kvm

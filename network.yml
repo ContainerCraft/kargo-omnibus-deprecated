@@ -1,0 +1,38 @@
+#!/usr/local/bin/ansible-playbook
+- name: 'CCIO | Kargo | Network | prepare host for virtual bridged networking'
+  hosts: kargo
+  become: true
+  gather_facts: yes
+  vars:
+    module: "prep"
+    ansible_name_module: "Konductor | CCIO | {{ ansible_os_family }} | {{ module }}"
+    
+  vars_files:
+    - 'vars/global.yml'
+    - 'vars/{{ ansible_os_family }}.yml'
+  roles:
+#   - role: openvswitch
+#     tags: ovs
+#   - role: libvirt 
+#     tags: kvm
+#   - role: networking
+#     tags: net
+
+  tasks:
+    - name: '{{ ansible_name_module }} | template | Stage bash network transition script' 
+      template:
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
+        mode: '{{ item.mode }}'
+      loop: 
+        - { mode: 755, src: "templates/bin/init-hypervisor-network.sh.j2", dest: "/tmp/init-hypervisor-network.sh"}
+#     when: ansible_facts['distribution'] != "RedHat"
+        
+#   - debug:
+#       msg:
+#         - "The next task may disconnect your current SSH session"
+#         - "If your shell becomes unresponsive for more than a minute, please re-connect to continue"
+
+#   - name: '{{ ansible_name_module }} | shell | Build libvirt primary virtual interface' 
+#     shell: "/tmp/init-hypervisor-network.sh external {{ external_host_interface }}"
+#     when: ansible_facts['distribution'] != "RedHat"

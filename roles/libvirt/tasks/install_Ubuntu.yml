@@ -1,0 +1,8 @@
+---
+- modprobe:
+  become: yes
+    name: kvm_intel
+    params: 'nested=1'
+- modprobe:
+  become: yes
+    name: vfio-pci

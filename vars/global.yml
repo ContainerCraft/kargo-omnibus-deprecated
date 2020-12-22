@@ -3,6 +3,11 @@
 domain_base: codectl.io
 name_cluster: 'kargo'
 domain_cluster: '{{ name_cluster }}.{{ domain_base }}'
+cluster_cidr: '10.42.0.0/16'
+kargo_name_n01: 'kargo-master-n01'
+kargo_addr_n01: '{{ ansible_default_ipv4.address }}'
+#kargo_addr_n02: '{{ ansible_default_ipv4.address }}'
+#kargo_addr_n03: '{{ ansible_default_ipv4.address }}'
 
 # Core variables
 name_vendor: ' CCIO'

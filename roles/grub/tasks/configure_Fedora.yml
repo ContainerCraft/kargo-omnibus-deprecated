@@ -1,0 +1,5 @@
+---
+- name: '{{ ansible_name_module }} | selinux | configure permissive'
+  command:
+    cmd: 'grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory intel_iommu=on iommu=pt rd.driver.pre=vfio-pci pci=realloc"'
+

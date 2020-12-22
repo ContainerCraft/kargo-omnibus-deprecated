@@ -95,10 +95,10 @@
         owner: "root"
         mode: "u=rw,g=,o="
 
-    - name: 'Replace https://localhost:6443 by https://{{ ansible_default_ipv4.address }}:6443'
+    - name: 'Replace https://localhost:6443 by https://{{ kargo_host }}:6443'
       command: >-
         k3s kubectl config set-cluster default
-          --server=https://{{ ansible_default_ipv4.address }}:6443
+          --server=https://{{ kargo_host }}:6443
           --kubeconfig /root/.kube/config
       changed_when: true
 
@@ -109,14 +109,14 @@
         dest: "{{ ansible_env.HOME }}/.kube/config"
         flat: yes
 
-    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ ansible_default_ipv4.address }}'
+    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ kargo_host }}'
       delegate_to: konductor
       lineinfile:
         dest: "{{ ansible_env.HOME }}/.kube/config"
         regexp: "{{ item.match }}"
         line: "{{ item.new }}"
       with_items:
-        - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ ansible_default_ipv4.address }}:6443' }
+        - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ kargo_host }}:6443' }
 
     ####### Copy k3s .kube/config to localhost .kube/config
     - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
