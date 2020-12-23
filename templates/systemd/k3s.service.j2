@@ -21,14 +21,13 @@ LimitNOFILE=1048576
 ExecStartPre=-/sbin/modprobe overlay
 ExecStartPre=-/sbin/modprobe br_netfilter
 ExecStart=/usr/local/bin/k3s server \
-                        '--disable-selinux' \
-                        '--no-deploy=traefik' \
-                        '--no-deploy=servicelb' \
-                        '--flannel-backend=none' \
-                        '--disable-network-policy' \
-                        '--https-listen-port=6443' \
-                        '--node-label=kargo-master' \
-                        '--node-name={{ kargo_name_n01 }}' \
-                        '--cluster-cidr={{ cluster_cidr }}' \
-                        '--bind-address={{ kargo_addr_n01 }}' \
-                        '--node-external-ip={{ kargo_addr_n01 }}'
+  --disable-selinux \
+  --no-deploy=traefik \
+  --no-deploy=servicelb \
+  --https-listen-port=6443 \
+  --cluster-cidr={{ cluster_cidr }} \
+  --bind-address={{ kargo_addr_n01 }} \
+  --node-external-ip={{ kargo_addr_n01 }}
+
+# --flannel-backend=none \
+# --disable-network-policy \
