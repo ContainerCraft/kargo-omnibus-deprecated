@@ -16,21 +16,10 @@
 ############################################################################
 # Kargo Tasks
 
-
-    - name: Check for latest release of k3s
-      delegate_to: konductor
-      command: >-
-          curl -s https://api.github.com/repos/k3s-io/k3s/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
-      register: k3s_version
-
-    - name: Download k3s binary x64
-      get_url:
-        url: https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/k3s
-        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/sha256sum-amd64.txt
-        dest: /usr/local/bin/k3s
-        owner: root
-        group: root
-        mode: 0755
+    - name: Check for latest release of k0s
+      delegate_to: self
+      shell: curl -s https://api.github.com/repos/k0sproject/k0s/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+      register: k0s_version
 
     - name: Purge pre-existing k0s binaries
       file:
@@ -38,20 +27,34 @@
         path: /root/.k0s
         mode: 0644
 
+#   - name: Purge pre-existing k0s binaries
+#     file:
+#       state: absent
+#       path: /usr/bin/k0s
+
+    - name: 'Download k0s binary {{ k0s_version }}'
+      get_url:
+      # url: https://github.com/k0sproject/k0s/releases/download/$version/k0s-{{ k0s_version }}-amd64
+        url: https://github.com/k0sproject/k0s/releases/download/v0.9.0-rc1/k0s-v0.9.0-rc1-amd64
+        dest: /usr/bin/k0s
+        owner: root
+        group: root
+        mode: 0755
+
     - name: Configure k0s bash completion 
       shell: '/usr/bin/k0s completion bash > /etc/bash_completion.d/k0s'
 
-    - name: Create kubectl symlink
-      file:
-        src: /usr/local/bin/k0s
-        dest: /usr/local/bin/kubectl
-        state: link
+#   - name: Create kubectl symlink
+#     file:
+#       src: /usr/local/bin/k0s
+#       dest: /usr/local/bin/kubectl
+#       state: link
 
-    - name: Create crictl symlink
-      file:
-        src: /usr/local/bin/k0s
-        dest: /usr/local/bin/crictl
-        state: link
+#   - name: Create crictl symlink
+#     file:
+#       src: /usr/local/bin/k0s
+#       dest: /usr/local/bin/crictl
+#       state: link
 
     ####### Place k0s.yaml 
     - name: Write K0s Systemd Service file
@@ -84,54 +87,54 @@
         owner: "root"
         mode: "u=rwx,g=rx,o="
 
-    - wait_for:
-        path: "/etc/rancher/k0s/k0s.yaml"
+#   - wait_for:
+#       path: "/etc/rancher/k0s/k0s.yaml"
 
-    - name: Copy config file to .kube/config
-      copy:
-        src: /etc/rancher/k0s/k0s.yaml
-        dest: /root/.kube/config
-        remote_src: yes
-        owner: "root"
-        mode: "u=rw,g=,o="
+#   - name: Copy config file to .kube/config
+#     copy:
+#       src: /etc/rancher/k0s/k0s.yaml
+#       dest: /root/.kube/config
+#       remote_src: yes
+#       owner: "root"
+#       mode: "u=rw,g=,o="
 
-    - name: 'Replace https://localhost:6443 by https://{{ kargo_addr_n01 }}:6443'
-      command: >-
-        k0s kubectl config set-cluster default
-          --server=https://{{ kargo_addr_n01 }}:6443
-          --kubeconfig /root/.kube/config
-      changed_when: true
+#   - name: 'Replace https://localhost:6443 by https://{{ kargo_addr_n01 }}:6443'
+#     command: >-
+#       k0s kubectl config set-cluster default
+#         --server=https://{{ kargo_addr_n01 }}:6443
+#         --kubeconfig /root/.kube/config
+#     changed_when: true
 
-    ####### Fetch k0s .kube/config
-    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
-      fetch:
-        src: "/etc/rancher/k0s/k0s.yaml"
-        dest: "{{ ansible_env.HOME }}/.kube/config"
-        flat: yes
+#   ####### Fetch k0s .kube/config
+#   - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+#     fetch:
+#       src: "/etc/rancher/k0s/k0s.yaml"
+#       dest: "{{ ansible_env.HOME }}/.kube/config"
+#       flat: yes
 
-    - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ kargo_host }}'
-      delegate_to: konductor
-      lineinfile:
-        dest: "{{ ansible_env.HOME }}/.kube/config"
-        regexp: "{{ item.match }}"
-        line: "{{ item.new }}"
-      with_items:
-        - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ kargo_host }}:6443' }
+#   - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ kargo_host }}'
+#     delegate_to: konductor
+#     lineinfile:
+#       dest: "{{ ansible_env.HOME }}/.kube/config"
+#       regexp: "{{ item.match }}"
+#       line: "{{ item.new }}"
+#     with_items:
+#       - { match: '    server: https://127.0.0.1:6443', new: '    server: https://{{ kargo_host }}:6443' }
 
-    ####### Copy k0s .kube/config to localhost .kube/config
-    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
-      delegate_to: host
-      file:
-        path: "{{ ansible_env.HOME }}/.kube"
-        state: directory
-        owner: "root"
-        mode: "u=rwx,g=rx,o="
+#   ####### Copy k0s .kube/config to localhost .kube/config
+#   - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+#     delegate_to: host
+#     file:
+#       path: "{{ ansible_env.HOME }}/.kube"
+#       state: directory
+#       owner: "root"
+#       mode: "u=rwx,g=rx,o="
 
 
-    ####### Copy k0s .kube/config to localhost .kube/config
-    - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
-      delegate_to: host
-      copy:
-        src: "/root/.kube/config"
-        dest: "{{ ansible_env.HOME }}/.kube/config.kargo"
-        mode: 0755
+#   ####### Copy k0s .kube/config to localhost .kube/config
+#   - name: '{{ ansible_name_module }} | fetch | copy config to localhost .kube/config'
+#     delegate_to: host
+#     copy:
+#       src: "/root/.kube/config"
+#       dest: "{{ ansible_env.HOME }}/.kube/config.kargo"
+#       mode: 0755
