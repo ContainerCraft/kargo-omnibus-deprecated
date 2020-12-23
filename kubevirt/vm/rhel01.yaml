@@ -16,8 +16,9 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 256G
-        storageClassName: rook-ceph-block
+            storage: 38G
+        storageClassName: hostpath
+#       storageClassName: rook-ceph-block
       source:
         pvc:
           name: registry-image-datavolume
@@ -28,7 +29,7 @@ spec:
     spec:
       domain:
         cpu:
-          cores: 8
+          cores: 2
           sockets: 1
           threads: 1
         devices:
@@ -51,7 +52,7 @@ spec:
           type: pc-q35-rhel8.2.0
         resources:
           requests:
-            memory: 64Gi
+            memory: 4Gi
       terminationGracePeriodSeconds: 0
       hostname: rhel01
       networks:

@@ -1,0 +1,8 @@
+---
+####### Download K3s Install Script
+- name: '{{ ansible_name_module_cloud }} | include | {{ ansible_distribution }} | Install Packages | get_url | Download k3s Script'
+  get_url:
+    url: 'https://get.k3s.io'
+    dest: /usr/local/bin/get-k3s-io
+    mode: 755
+  become: yes

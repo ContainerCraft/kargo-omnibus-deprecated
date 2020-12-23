@@ -1,15 +1,23 @@
 ---
+- name: Check for latest release of k0s
+  delegate_to: self
+  shell: curl -s https://api.github.com/repos/kubevirt/cluster-network-addons-operator/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+  register: cnao_version
+
 - name: Apply network addons operator namespace
-  command: kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.43.0/namespace.yaml
+  delegate_to: self
+  command: "kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v{{ cnao_version.stdout }}/namespace.yaml"
 
 - name: Apply network addons operator crd
-  command: kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.43.0/network-addons-config.crd.yaml
+  delegate_to: self
+  command: "kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v{{ cnao_version.stdout }}/network-addons-config.crd.yaml -n cluster-network-addons"
 
 - name: Apply network addons operator operator
-  command: kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.43.0/operator.yaml
+  delegate_to: self
+  command: "kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v{{ cnao_version.stdout }}/operator.yaml -n cluster-network-addons"
 
 - name: Apply CNAO config
-  delegate_to: konductor
-  k8s:
-    state: present
-    src: /root/platform/iac/kargo/templates/cluster-network-addons-operator/network-addons-config-cr.yaml
+  delegate_to: self
+  command:
+    cmd: 
+      kubectl apply -f /root/platform/iac/kargo/templates/cluster-network-addons-operator/network-addons-config-cr.yaml -n cluster-network-addons

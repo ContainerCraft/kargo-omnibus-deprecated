@@ -1,0 +1,5 @@
+---
+- name: '{{ ansible_name_module }} | include_tasks | tools.yaml'
+  include_tasks: tools.yml
+- name: '{{ ansible_name_module }} | include_tasks | operator.yaml'
+  include_tasks: operator.yml

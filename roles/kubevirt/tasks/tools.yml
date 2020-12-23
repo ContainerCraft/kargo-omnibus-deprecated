@@ -1,0 +1,14 @@
+---
+- name: Check for latest release of kubevirt
+  delegate_to: self
+  shell: curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+  register: kvirt_version
+
+- name: 'Download virtctl {{ kvirt_version }}'
+  delegate_to: self
+  get_url:
+    url: 'https://github.com/kubevirt/kubevirt/releases/download/v{{ kvirt_version.stdout }}/virtctl-v{{ kvirt_version.stdout }}-linux-amd64'
+    dest: /usr/local/bin/virtctl
+    owner: root
+    group: root
+    mode: 0755

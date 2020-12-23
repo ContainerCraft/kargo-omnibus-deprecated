@@ -1,0 +1,37 @@
+---
+- name: Create base HPPO Directory
+  file:
+    path: /var/hpvolumes
+    state: directory
+    mode: 0755
+
+- name: Apply HPPO 
+  delegate_to: self
+  command:
+    cmd:
+      kubectl apply -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/master/deploy/namespace.yaml
+
+- name: Apply network addons operator crd
+  delegate_to: self
+  command:
+    cmd:
+      kubectl apply -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/master/deploy/operator.yaml -n hostpath-provisioner
+
+- name: Apply network addons operator operator
+  delegate_to: self
+  command:
+    cmd:
+      kubectl apply -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/master/deploy/hostpathprovisioner_cr.yaml -n hostpath-provisioner
+
+- name: Apply network addons operator operator
+  delegate_to: self
+  command:
+    cmd:
+      kubectl apply -f /root/platform/iac/kargo/templates/hostpath/storageclass.yaml.j2
+     #kubectl apply -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/master/deploy/storageclass-wffc.yaml
+
+- name: set local-path storage class to be the default
+  delegate_to: self
+  command: 
+    cmd: 
+      "kubectl patch storageclass hostpath -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"

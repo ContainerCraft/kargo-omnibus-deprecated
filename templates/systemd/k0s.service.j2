@@ -1,0 +1,26 @@
+[Unit]
+Description=k0s - Zero Friction Kubernetes
+ConditionFileIsExecutable=/usr/bin/k0s
+Documentation=https://k0sproject.io
+After=network-online.target
+Wants=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=notify
+Delegate=yes
+RestartSec=5s
+Restart=always
+KillMode=process
+TasksMax=infinity
+TimeoutStartSec=0
+LimitCORE=infinity
+LimitNPROC=infinity
+LimitNOFILE=1048576
+StartLimitInterval=5
+StartLimitBurst=10
+ExecStartPre=-/sbin/modprobe overlay
+ExecStartPre=-/sbin/modprobe br_netfilter
+ExecStart=/usr/bin/k0s server --enable-worker --config /root/.k0s/k0s.yaml

@@ -3,10 +3,13 @@ configure_ovs_packages: false
 packages_Ubuntu:
   - qemu-kvm
   - libvirt0
+  - bridge-utils
+  - fuse-overlayfs
   - libvirt-daemon
   - python3-libvirt
   - qemu-system-x86
   - openvswitch-switch
+  - libvirt-daemon-system
   - libvirt-daemon-driver-qemu
   - libvirt-daemon-system-systemd
 

@@ -1,0 +1,17 @@
+---
+- name: Check for latest release of kubevirt
+  delegate_to: self
+  shell: curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+  register: kvirt_version
+
+- name: Apply Kubevirt Operator
+  delegate_to: self
+  command:
+    cmd: |
+      kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v{{ kvirt_version.stdout }}/kubevirt-operator.yaml
+
+- name: Apply Kubevirt CR
+  delegate_to: self
+  command:
+    cmd: |
+      kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v{{ kvirt_version.stdout }}/kubevirt-cr.yaml

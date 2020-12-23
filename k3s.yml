@@ -16,23 +16,6 @@
 ############################################################################
 # Kargo Tasks
 
-    ####### Install packages
-    - name: '{{ ansible_name_module }} | include | {{ ansible_distribution }} | Install Packages'
-      include_tasks: 'roles/packages/tasks/{{ ansible_distribution }}.yml'
-
-    - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Start ContainerD service'
-      systemd:
-        name: containerd
-        enabled: yes
-      become: yes
-
-    - name: '{{ ansible_name_module }} | systemd | {{ ansible_distribution }} | Disable Firewalld service'
-      systemd:
-        name: firewalld
-        state: stopped
-        enabled: no
-      become: yes
-
     - name: Check for latest release of k3s
       delegate_to: konductor
       command: >-

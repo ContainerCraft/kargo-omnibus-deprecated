@@ -1,0 +1,17 @@
+---
+- name: Check for latest release of containerized-data-importer
+  delegate_to: self
+  shell: curl -s https://api.github.com/repos/kubevirt/containerized-data-importer/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+  register: cdi_version
+
+- name: Apply CDI Operator
+  delegate_to: self
+  command:
+    cmd: |
+      kubectl apply -f https://github.com/kubevirt/containerized-data-importer/releases/download/v{{ cdi_version.stdout }}/cdi-operator.yaml
+
+- name: Apply CDI CR
+  delegate_to: self
+  command:
+    cmd: |
+      kubectl apply -f https://github.com/kubevirt/containerized-data-importer/releases/download/v{{ cdi_version.stdout }}/cdi-cr.yaml
