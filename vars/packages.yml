@@ -1,6 +1,7 @@
 ---
 configure_ovs_packages: false
 packages_Ubuntu:
+  - runc
   - qemu-kvm
   - libvirt0
   - bridge-utils

@@ -17,15 +17,14 @@
 # Kargo Tasks
 
     - name: Check for latest release of k3s
-      delegate_to: konductor
-      command: >-
-          curl -s https://api.github.com/repos/k3s-io/k3s/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
+      delegate_to: self
+      shell: curl -s https://api.github.com/repos/k3s-io/k3s/releases/latest | awk -F '["v,+]' '/tag_name/{print $5}'
       register: k3s_version
 
     - name: Download k3s binary x64
       get_url:
-        url: https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/k3s
-        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/sha256sum-amd64.txt
+        url: 'https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s2/k3s'
+#       checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version.stdout }}%2Bk3s1/sha256sum-amd64.txt
         dest: /usr/local/bin/k3s
         owner: root
         group: root
@@ -91,7 +90,7 @@
         flat: yes
 
     - name: '{{ ansible_name_module }} | lineinfile | find replace localhost/{{ kargo_host }}'
-      delegate_to: konductor
+      delegate_to: self
       lineinfile:
         dest: "{{ ansible_env.HOME }}/.kube/config"
         regexp: "{{ item.match }}"
