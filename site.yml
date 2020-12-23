@@ -10,8 +10,8 @@
 - import_playbook: packages.yml
 - import_playbook: openvswitch.yml
 - import_playbook: libvirt.yml
-- import_playbook: grub.yml
 - import_playbook: resolver.yml
+- import_playbook: grub.yml
 - import_playbook: prep.yml
 # import_playbook: k0s.yml
 - import_playbook: k3s.yml
