@@ -27,5 +27,5 @@ ssh root@10.0.0.3 -p 30928
 ```
 ```
 # for software emulation (hvm == software emulated vm hardware
-kubectl create configmap kubevirt-config -n kubevirt --from-literal debug-useEmulation=true
+kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
 ```
